@@ -1,18 +1,13 @@
-import React from "react";
+import React, {useState, useEffect} from "react";
 import { ThemeProvider } from "styled-components";
 
 // Components
-import { Countdown } from "./components/countdown";
+import { Countdown } from "./components/countdown/Countdown";
 
-interface StateProps {
-  theme: any;
-}
+const App = () => {
+  const [theme, setTheme] = useState<any>(null)
 
-class App extends React.Component {
-  state: StateProps = {
-    theme: null,
-  };
-  componentDidMount() {
+  useEffect(() => {
     fetch(
       "https://api.koala.io/marketing/v1/device-configurations/alias/web-config",
       {
@@ -24,21 +19,16 @@ class App extends React.Component {
     )
       .then((res) => res.json())
       .then(
-        (result) => this.setState({ theme: result }),
+        (result) => setTheme(result),
         (error) => console.log(error)
       );
-  }
-  render() {
-    const data =
-      this.state.theme && this.state.theme.data && this.state.theme.data.data;
-    return (
-      this.state.theme && (
-        <ThemeProvider theme={data}>
-          <Countdown />
-        </ThemeProvider>
-      )
-    );
-  }
+  }, []);
+
+  return (
+    <>
+      {theme && theme.data && theme.data.data && <ThemeProvider theme={theme.data.data}><Countdown /></ThemeProvider>}
+    </>
+  );
 }
 
 export default App;
